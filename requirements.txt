@@ -1,3 +1,5 @@
 tk==0.1.0
 numpy==1.21.0
 matplotlib==3.4.2
+pyserial==3.5
+pyfirmata

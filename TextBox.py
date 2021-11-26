@@ -2,6 +2,7 @@ from includes import *
 
 class TextBox:
     def __init__(self, root_frame):
+        self.is_open = False
         self.root_frame = root_frame
         self.text_box_frame = ttk.Frame(self.root_frame, style='Frame.TFrame')
         self.text_box = scrolledtext.ScrolledText(self.text_box_frame)
@@ -39,14 +40,16 @@ class TextBox:
             Curabitur laoreet viverra libero. Quisque dapibus imperdiet sapien, eu tristique felis maximus at. Aliquam elementum sit amet leo sollicitudin rhoncus. Nulla efficitur tellus mauris, a bibendum est elementum dictum. Maecenas nulla erat, consequat et rutrum fermentum, vestibulum cursus mauris. Nullam eget finibus lectus. Ut molestie odio tellus, a gravida tellus accumsan viverra. Aliquam mollis rhoncus quam, nec tempus mi tempus eget. Aliquam hendrerit facilisis nibh, et semper turpis dapibus luctus. In imperdiet maximus luctus.
         ''')
 
-    def draw(self):
+    def show(self):
+        self.is_open = True
         self.text_box_frame.place(relx=0, rely=0, relwidth=1, relheight=1)
+
+    def clear(self):
+        self.is_open = False
+        self.text_box_frame.place_forget()
 
     def redraw(self, size):
         self.text_box.place(x=Settings.TEXTBOX_LEFT_MARGIN, y=0, width=size[0] - Settings.TEXTBOX_LEFT_MARGIN, height=size[1])
-
-    def clear(self):
-        self.text_box_frame.place_forget()
 
     def configure(self, **kwargs):
         self.text_box.configure(kwargs)
@@ -57,6 +60,17 @@ class TextBox:
         self.text_box.insert(tkinter.INSERT, '\n' + text)
         self.text_box.configure(state='disabled')
 
+    def appendText(self, text, newline=True):
+        if newline:
+            text = '\n' + text
+        self.text_box.configure(state='normal')
+        self.text_box.insert(tkinter.END, text)
+        self.text_box.configure(state='disabled')
+
+    def clearText(self):
+        self.text_box.configure(state='normal')
+        self.text_box.delete(1.0, tkinter.END)
+        self.text_box.configure(state='disabled')
 
 if __name__ == '__main__':
     pass
