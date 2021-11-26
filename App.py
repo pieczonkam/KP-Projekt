@@ -4,7 +4,7 @@ from TextBox import *
 
 class App:
     '''
-        Main application class
+        Main application classa
     '''
     def __init__(self):
         self.width, self.height = Settings.WINDOW_MIN_SIZE
