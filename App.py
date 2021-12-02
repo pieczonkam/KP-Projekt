@@ -81,9 +81,6 @@ class App():
     
     def onExit(self):
         if isinstance(self.arduino_wrapper, type(None)):
-            print('Active threads count:', threading.active_count())
-            for thread in threading.enumerate():
-                print(thread)
             self.window.destroy()
         else:
             if self.arduino_wrapper.running:

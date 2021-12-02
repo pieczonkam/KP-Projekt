@@ -13,6 +13,7 @@ class ArduinoWrapper(threading.Thread):
 
         self.board = None
         self.ports = None
+        self.port_name = ''
 
     def resetAppPins(self):
         self.app.pin_nmb_values_dict['analog'] = ['A' + str(i) for i in range(1)]
@@ -45,6 +46,7 @@ class ArduinoWrapper(threading.Thread):
         for port in self.ports:
             try:
                 self.board = pyfirmata.Arduino(port)
+                self.port_name = port
             except Exception as e:
                 pass
 
@@ -60,7 +62,7 @@ class ArduinoWrapper(threading.Thread):
             if pin_nmb[0] == 'A':
                 self.board.analog[pin].enable_reporting()
 
-            self.app.info_label['text'] = 'Połączono (port %s)' % (self.board.name)
+            self.app.info_label['text'] = 'Połączono (port %s)' % (self.port_name)
             self.prepared = True
             self.running = True
 
@@ -80,7 +82,7 @@ class ArduinoWrapper(threading.Thread):
                         self.board.analog[pin].enable_reporting()
                     self.app.chart.clearChart()
                     self.app.text_box.clearText(3.0)
-                    self.app.info_label['text'] = 'Połączono (port %s)' % (self.board.name)
+                    self.app.info_label['text'] = 'Połączono (port %s)' % (self.port_name)
                     
                 if pin_nmb[0] == 'A':
                     val = self.board.analog[pin].read()
@@ -88,7 +90,7 @@ class ArduinoWrapper(threading.Thread):
                     val = self.board.digital[pin].read()
                 if isinstance(val, type(None)):
                     val = 0.0
-                val = val * (Settings.RANGE[1] - Settings.RANGE[0]) + Settings.RANGE[0]
+                val = round(val * (Settings.RANGE[1] - Settings.RANGE[0]) + Settings.RANGE[0], 2)
 
                 self.app.chart.draw(val, t)
                 self.app.text_box.appendText('%s\t\t\t%s' % (str(t), str(val) + ' ' + Settings.UNIT))

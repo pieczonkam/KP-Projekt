@@ -1,4 +1,3 @@
-from sys import settrace
 from includes import *
 
 class TextBox:
