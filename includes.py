@@ -1,10 +1,12 @@
 import tkinter
 from tkinter import ttk
 from tkinter import scrolledtext
+from tkinter import messagebox
+import pyfirmata
+import serial.tools.list_ports
 import numpy as np
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from matplotlib import animation
 import random
 import time
 import threading
