@@ -47,12 +47,14 @@ class ArduinoWrapper(threading.Thread):
             try:
                 self.board = pyfirmata.Arduino(port)
                 self.port_name = port
-            except Exception as e:
-                pass
+            except Exception:
+                self.board = None
 
         if not isinstance(self.board, type(None)):
             self.setAppPins()
             self.app.chart.clearChart()
+            self.app.time_val_dict['time'] = []
+            self.app.time_val_dict['val'] = []
             self.app.text_box.clearText(3.0)
 
             it = pyfirmata.util.Iterator(self.board)
@@ -66,12 +68,12 @@ class ArduinoWrapper(threading.Thread):
             self.prepared = True
             self.running = True
 
-            t = 0.0
+            t0 = time.time()
             while self.running:
                 pin_nmb = self.app.pin_nmb_var.get()
                 if pin_nmb != prev_pin_nmb:
                     self.app.info_label['text'] = 'Zmiana pinu...'
-                    t = 0.0
+                    t0 = time.time()
 
                     prev_pin = int(prev_pin_nmb[1:])
                     if prev_pin_nmb[0] == 'A':
@@ -81,6 +83,8 @@ class ArduinoWrapper(threading.Thread):
                     if pin_nmb[0] == 'A':
                         self.board.analog[pin].enable_reporting()
                     self.app.chart.clearChart()
+                    self.app.time_val_dict['time'] = []
+                    self.app.time_val_dict['val'] = []
                     self.app.text_box.clearText(3.0)
                     self.app.info_label['text'] = 'Połączono (port %s)' % (self.port_name)
                     
@@ -90,15 +94,19 @@ class ArduinoWrapper(threading.Thread):
                     val = self.board.digital[pin].read()
                 if isinstance(val, type(None)):
                     val = 0.0
-                val = round(val * (Settings.RANGE[1] - Settings.RANGE[0]) + Settings.RANGE[0], 2)
+                val = val * (Settings.RANGE[1] - Settings.RANGE[0]) + Settings.RANGE[0]
+                t = round(time.time() - t0, 1)
 
-                self.app.chart.draw(val, t)
-                self.app.text_box.appendText('%s\t\t\t%s' % (str(t), str(val) + ' ' + Settings.UNIT))
+                self.app.time_val_dict['time'].append(t)
+                self.app.time_val_dict['val'].append(val)
+                self.app.chart.draw(round(val, 2), t)
+                self.app.text_box.appendText('%.1f\t\t\t%.2f %s' % (t, round(val, 2), Settings.UNIT))
+                self.app.text_box.scrollToBottom()
                 
-                t += Settings.DATA_ACQUISITION_FREQUENCY
                 time.sleep(Settings.DATA_ACQUISITION_FREQUENCY)
             
             self.board.exit()
+            it = None
             self.board = None
         else:
             self.app.info_label['text'] = 'Nie udało się połączyć, rozłączanie...'

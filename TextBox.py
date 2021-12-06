@@ -7,7 +7,7 @@ class TextBox:
         self.text_box_frame = ttk.Frame(self.root_frame, style='Frame.TFrame')
         self.text_box = scrolledtext.ScrolledText(self.text_box_frame)
 
-        self.setText('Time [s]\t\t\tValue\n')
+        self.setText('Czas [s]\t\t\tWartość\n')
 
     def show(self):
         self.is_open = True
@@ -23,10 +23,20 @@ class TextBox:
     def configure(self, **kwargs):
         self.text_box.configure(kwargs)
 
+    def scrollToBottom(self):
+        self.text_box.see(tkinter.END)
+
     def setText(self, text):
         self.text_box.configure(state='normal')
         self.text_box.delete(1.0, tkinter.END)
         self.text_box.insert(tkinter.INSERT, '\n' + text)
+        self.text_box.configure(state='disabled')
+
+    def setTextFromDict(self, time_val_dict):
+        self.text_box.configure(state='normal')
+        self.text_box.delete(4.0, tkinter.END)
+        for i in range(len(time_val_dict['time'])):
+            self.text_box.insert(tkinter.END, '\n%.1f\t\t\t%.2f %s' % (time_val_dict['time'][i], round(time_val_dict['val'][i], 2), Settings.UNIT))
         self.text_box.configure(state='disabled')
 
     def appendText(self, text, newline=True):

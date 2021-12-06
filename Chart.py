@@ -1,4 +1,3 @@
-from typing import Set
 from includes import *
 
 class Chart:
@@ -20,7 +19,7 @@ class Chart:
         self.title = title
         self.x_label = x_label
         self.y_label = y_label
-
+        
     def show(self):
         self.is_open = True
         self.chart_frame.place(relx=0, rely=0, relwidth=1, relheight=1)
@@ -29,21 +28,22 @@ class Chart:
         self.is_open = False
         self.chart_frame.place_forget()
        
-    def draw(self, new_val, t):
+    def draw(self, new_val=None, t=None):
         self.ax.clear()
     
-        if len(self.x_list) < Settings.CHART_DATA_LEN:
-            self.x_list.append(t)
-            self.y_list.append(new_val)
-        else:
-            self.x_list = self.x_list[1:] + [self.x_list[-1] + t]
-            self.y_list = self.y_list[1:] + [new_val]
+        if not isinstance(new_val, type(None)) and not isinstance(t, type(None)):
+            if len(self.x_list) < Settings.CHART_DATA_LEN:
+                self.x_list.append(t)
+                self.y_list.append(new_val)
+            else:
+                self.x_list = self.x_list[1:] + [t]
+                self.y_list = self.y_list[1:] + [new_val]
         self.ax.plot(self.x_list, self.y_list)
 
         self.ax.set_title(self.title, weight='bold')
         self.ax.set_xlabel(self.x_label)
         self.ax.set_ylabel(self.y_label)
-        self.ax.set_ylim(tuple(Settings.RANGE))
+        self.ax.set_ylim((Settings.RANGE[0] - 0.1 * (Settings.RANGE[1] - Settings.RANGE[0]), Settings.RANGE[1] + 0.1 * (Settings.RANGE[1] - Settings.RANGE[0])))
         self.ax.grid(True, which='both')
 
         self.canvas.draw()
@@ -51,6 +51,7 @@ class Chart:
     def clearChart(self):
         self.x_list = []
         self.y_list = []
+        self.draw()
 
 
 if __name__ == '__main__':

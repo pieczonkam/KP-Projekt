@@ -73,11 +73,13 @@ class App():
             tkinter.Button(self.menu_top_frame)
         ]
 
-        # Objects of user-defined classes
+        self.time_val_dict = {'time': [], 'val': []}
         self.chart = Chart(self.main_frame)
         self.text_box = TextBox(self.main_frame)
-        self.settings_window = SettingsWindow(self.window, Settings.SETTINGS_WINDOW_SIZE[0], Settings.SETTINGS_WINDOW_SIZE[1])
+        self.settings_window = SettingsWindow(self.window, Settings.SETTINGS_WINDOW_SIZE[0], Settings.SETTINGS_WINDOW_SIZE[1], self)
         self.arduino_wrapper = None
+
+        self.chart.draw()
     
     def onExit(self):
         if isinstance(self.arduino_wrapper, type(None)):
@@ -127,6 +129,7 @@ class App():
                 self.chart.setChartParams('Detekcja dotyku', 'Czas [s]', 'Wartość sygnału [%s]' % Settings.UNIT)
             elif button_idx == 4:
                 self.chart.setChartParams(Settings.MEASUREMENT_TYPE, 'Czas [s]', 'Wartość sygnału [%s]' % Settings.UNIT)
+            self.chart.draw()
         elif menu_type == 'left bottom':
             if button_idx == 0:
                 if isinstance(self.arduino_wrapper, type(None)):
@@ -148,9 +151,11 @@ class App():
                 if self.chart.is_open:
                     self.chart.clearChart()
                 elif self.text_box.is_open:
+                    self.time_val_dict['time'] = []
+                    self.time_val_dict['val'] = []
                     self.text_box.clearText(3.0)
             elif button_idx == 3:
-                self.settings_window.show(self.chart.setChartParams, self.menu_left_upper_button_idx)
+                self.settings_window.show()
         
     def setButtonDisabled(self, menu_type, button_idx):
         if menu_type == 'left top':
@@ -284,6 +289,12 @@ class App():
         self.menu_top_buttons[3].bind('<Enter>', lambda _: self.menu_top_buttons[3].configure(bg=Settings.BUTTON_HOVER_COLOR_LIGHT))
         self.menu_top_buttons[3].bind('<Leave>', lambda _: self.menu_top_buttons[3].configure(bg=Settings.BUTTON_COLOR_LIGHT))
        
+    def mapValues(self, min_prev, max_prev):
+        for i in range(len(self.chart.y_list)):
+            self.chart.y_list[i] = (self.chart.y_list[i] - min_prev) / (max_prev - min_prev) * (Settings.RANGE[1] - Settings.RANGE[0]) + Settings.RANGE[0]
+        for i in range(len(self.time_val_dict['val'])):
+            self.time_val_dict['val'][i] = (self.time_val_dict['val'][i] - min_prev) / (max_prev - min_prev) * (Settings.RANGE[1] - Settings.RANGE[0]) + Settings.RANGE[0]
+
 
 if __name__ == '__main__':
     try:

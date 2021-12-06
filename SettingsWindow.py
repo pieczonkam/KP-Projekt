@@ -2,15 +2,13 @@ from tkinter import Variable
 from includes import *
 
 class SettingsWindow:
-    def __init__(self, root, width, height):
+    def __init__(self, root, width, height, app):
         self.root = root
         self.width = width
         self.height = height
+        self.app = app
 
-    def show(self, method, idx):
-        self.method = method
-        self.idx = idx
-
+    def show(self):
         posx = self.root.winfo_x() + (self.root.winfo_width() - self.width) / 2 
         posy = self.root.winfo_y() + (self.root.winfo_height() - self.height) / 2
         self.window = tkinter.Toplevel(self.root)
@@ -74,6 +72,8 @@ class SettingsWindow:
     def overwriteValues(self):
         range_min = None
         range_max = None
+        range_min_prev = Settings.RANGE[0]
+        range_max_prev = Settings.RANGE[1]
 
         try:
             range_min = float(self.range_min_var.get())
@@ -95,16 +95,20 @@ class SettingsWindow:
             Settings.RANGE[1] = range_max
             Settings.MEASUREMENT_TYPE = self.measurement_type_var.get()
                         
-            if self.idx == 0:
-                self.method('Odczyt temperatury', 'Czas [s]', 'Temperatura [%s]' % Settings.UNIT)
-            elif self.idx == 1:
-                self.method('Odczyt natężenia światła', 'Czas [s]', 'Natężenie światła [%s]' % Settings.UNIT)
-            elif self.idx == 2:
-                self.method('Odczyt napięcia Halla', 'Czas [s]', 'Napięcie [%s]' % Settings.UNIT)
-            elif self.idx == 3:
-                self.method('Detekcja dotyku', 'Czas [s]', 'Wartość sygnału [%s]' % Settings.UNIT)
-            elif self.idx == 4:
-                self.method(Settings.MEASUREMENT_TYPE, 'Czas [s]', 'Wartość sygnału [%s]' % Settings.UNIT)
+            if self.app.menu_left_upper_button_idx == 0:
+                self.app.chart.setChartParams('Odczyt temperatury', 'Czas [s]', 'Temperatura [%s]' % Settings.UNIT)
+            elif self.app.menu_left_upper_button_idx == 1:
+                self.app.chart.setChartParams('Odczyt natężenia światła', 'Czas [s]', 'Natężenie światła [%s]' % Settings.UNIT)
+            elif self.app.menu_left_upper_button_idx == 2:
+                self.app.chart.setChartParams('Odczyt napięcia Halla', 'Czas [s]', 'Napięcie [%s]' % Settings.UNIT)
+            elif self.app.menu_left_upper_button_idx == 3:
+                self.app.chart.setChartParams('Detekcja dotyku', 'Czas [s]', 'Wartość sygnału [%s]' % Settings.UNIT)
+            elif self.app.menu_left_upper_button_idx == 4:
+                self.app.chart.setChartParams(Settings.MEASUREMENT_TYPE, 'Czas [s]', 'Wartość sygnału [%s]' % Settings.UNIT)
+
+            self.app.mapValues(range_min_prev, range_max_prev)
+            self.app.text_box.setTextFromDict(self.app.time_val_dict)
+            self.app.chart.draw()
             self.window.destroy()
 
     def setStyle(self):
