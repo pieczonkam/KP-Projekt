@@ -14,5 +14,5 @@ python3 App.py
 ```
 
 ## Screenshots
-<img src="/screenshots/app.jpg" width="800" height="550" />
-<img src="/screenshots/app_plot.jpg" width="800" height="550" />
+<img src="/screenshots/app.jpg" width="800" height="450" />
+<img src="/screenshots/app_plot.jpg" width="800" height="450" />
